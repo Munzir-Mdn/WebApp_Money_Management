@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <?!= include('style'); ?>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Money Management</h1>
+
+      <div class="card">
+        <h2>Tambah Transaksi</h2>
+
+        <div class="grid">
+          <label>Tarikh
+            <input type="date" id="date" />
+          </label>
+
+          <label>Type
+            <select id="type">
+              <option value="Expense">Expense</option>
+              <option value="Income">Income</option>
+            </select>
+          </label>
+
+          <label>Kategori
+            <select id="category"></select>
+          </label>
+
+          <label>Amount (RM)
+            <input type="number" id="amount" step="0.01" min="0" />
+          </label>
+
+          <label>Kaedah Bayaran
+            <input type="text" id="paymentMethod" placeholder="Cash / Card / FPX..." />
+          </label>
+
+          <label>Deskripsi
+            <input type="text" id="description" placeholder="Contoh: Nasi lemak" />
+          </label>
+        </div>
+
+        <button id="btnAdd">Simpan</button>
+        <div class="msg" id="msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>Ringkasan Bulan</h2>
+
+        <div class="row">
+          <label>Bulan
+            <input type="month" id="month" />
+          </label>
+          <button id="btnRefresh">Refresh</button>
+        </div>
+
+        <div class="summary" id="summary"></div>
+      </div>
+
+      <div class="card">
+        <h2>Senarai Transaksi</h2>
+        <div class="tableWrap">
+          <table id="txTable">
+            <thead>
+              <tr>
+                <th>Tarikh</th>
+                <th>Type</th>
+                <th>Kategori</th>
+                <th>Deskripsi</th>
+                <th>Amount</th>
+                <th>Bayaran</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="foot">Data disimpan dalam Google Sheets.</p>
+    </div>
+
+    <?!= include('app.js'); ?>
+  </body>
+</html>

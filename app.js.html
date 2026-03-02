@@ -1,0 +1,142 @@
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function setMsg(text, isError=false) {
+    const el = $('msg');
+    el.textContent = text || '';
+    el.style.color = isError ? 'crimson' : 'green';
+  }
+
+  function formatRM(n) {
+    return (Number(n) || 0).toLocaleString('ms-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function todayISO() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function currentMonthISO() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    return `${yyyy}-${mm}`;
+  }
+
+  async function init() {
+    $('date').value = todayISO();
+    $('month').value = currentMonthISO();
+
+    await loadCategories();
+    await refreshAll();
+
+    $('type').addEventListener('change', loadCategories);
+    $('btnAdd').addEventListener('click', onAdd);
+    $('btnRefresh').addEventListener('click', refreshAll);
+  }
+
+  function gas(fn, args) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(err => reject(err))
+        [fn](args);
+    });
+  }
+
+  async function loadCategories() {
+    const cats = await gas('listCategories');
+    const type = $('type').value;
+    const list = (type === 'Income') ? cats.Income : cats.Expense;
+
+    $('category').innerHTML = list.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+  }
+
+  async function onAdd() {
+    try {
+      setMsg('');
+      const payload = {
+        date: $('date').value,
+        type: $('type').value,
+        category: $('category').value,
+        description: $('description').value,
+        amount: $('amount').value,
+        paymentMethod: $('paymentMethod').value
+      };
+
+      const res = await gas('addTransaction', payload);
+      $('amount').value = '';
+      $('description').value = '';
+      setMsg(`Disimpan. ID: ${res.id}`);
+      await refreshAll();
+    } catch (e) {
+      setMsg(e.message || String(e), true);
+    }
+  }
+
+  async function refreshAll() {
+    const month = $('month').value;
+    const [summary, list] = await Promise.all([
+      gas('getMonthlySummary', month),
+      gas('listTransactions', { month })
+    ]);
+
+    renderSummary(summary);
+    renderTable(list);
+  }
+
+  function renderSummary(s) {
+    const html = `
+      <div><b>Bulan:</b> ${escapeHtml(s.month)}</div>
+      <div><b>Income:</b> RM ${formatRM(s.income)}</div>
+      <div><b>Expense:</b> RM ${formatRM(s.expense)}</div>
+      <div><b>Balance:</b> RM ${formatRM(s.balance)}</div>
+      <hr/>
+      <div><b>Top kategori:</b></div>
+      <ul>
+        ${s.byCategory.slice(0,8).map(x => `
+          <li>${escapeHtml(x.type)} - ${escapeHtml(x.category)}: RM ${formatRM(x.total)}</li>
+        `).join('')}
+      </ul>
+    `;
+    $('summary').innerHTML = html;
+  }
+
+  function renderTable(list) {
+    const tbody = $('txTable').querySelector('tbody');
+    tbody.innerHTML = list.map(t => `
+      <tr>
+        <td>${escapeHtml(t.date)}</td>
+        <td>${escapeHtml(t.type)}</td>
+        <td>${escapeHtml(t.category)}</td>
+        <td>${escapeHtml(t.description || '')}</td>
+        <td class="right">RM ${formatRM(t.amount)}</td>
+        <td>${escapeHtml(t.paymentMethod || '')}</td>
+        <td class="right"><button class="danger" data-id="${t.id}">Delete</button></td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('button[data-id]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        if (!confirm('Delete transaksi ini?')) return;
+        await gas('deleteTransaction', id);
+        await refreshAll();
+      });
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
+
+  init();
+</script>
