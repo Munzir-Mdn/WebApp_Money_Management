@@ -3,16 +3,57 @@
 WebApp Money Management ialah aplikasi pengurusan kewangan ringkas yang dibangunkan menggunakan Google Apps Script dan Google Sheets sebagai pangkalan data. Aplikasi ini membolehkan pengguna merekod transaksi Income dan Expense, menyimpan data dalam Google Sheets, memaparkan senarai transaksi serta menghasilkan ringkasan bulanan secara automatik.
 
 ## Features
-Aplikasi ini menyokong penambahan transaksi dengan maklumat seperti tarikh, jenis (Income atau Expense), kategori, deskripsi, jumlah dan kaedah bayaran. Sistem memaparkan senarai transaksi mengikut bulan, membenarkan pemadaman transaksi berdasarkan ID unik, serta menjana ringkasan bulanan yang mengandungi jumlah keseluruhan Income, jumlah Expense, baki semasa dan pecahan jumlah mengikut kategori.
+- Tambah transaksi (Income atau Expense)
+- Simpan data dalam Google Sheets
+- Paparan senarai transaksi mengikut bulan
+- Padam transaksi berdasarkan ID
+- Ringkasan bulanan: Total Income, Total Expense, Balance
+- Statistik jumlah per kategori
 
-## Technology Stack
-Backend dibangunkan menggunakan Google Apps Script. Frontend menggunakan HTML, JavaScript dan CSS melalui HTML Service. Data disimpan dan diuruskan dalam Google Sheets menggunakan SpreadsheetApp API.
+## Technologies Used
+- Google Apps Script (Web App + HTML Service)
+- Google Sheets (Database)
+- HTML, JavaScript dan CSS (Frontend)
 
 ## Project Structure
-Code.gs mengandungi logik backend termasuk fungsi CRUD transaksi dan pengiraan summary. Index.html berfungsi sebagai antaramuka utama pengguna. app.js.html mengurus interaksi frontend dengan backend menggunakan google.script.run. style.html mengandungi reka bentuk dan susun atur UI.
+- Code.gs: Backend logic dan integrasi Google Sheets
+- Index.html: User interface utama
+- app.js.html: JavaScript frontend (event handling dan rendering data)
+- style.html: Styling UI
+- README.md: Dokumentasi projek
 
-## Database Structure (Google Sheets)
-Spreadsheet mesti mengandungi sekurang-kurangnya dua sheet iaitu Transactions dan Categories. Sheet Transactions perlu mempunyai header berikut pada baris pertama: ID, Date, Type, Category, Description, Amount, PaymentMethod, CreatedAt. Sheet Categories pula perlu mempunyai header Type dan Category serta menyenaraikan kategori mengikut jenis Income atau Expense.
+## Database Setup (Google Sheets)
+
+Cipta satu Google Spreadsheet bernama “MoneyDB” dan sediakan dua sheet berikut:
+
+1. Sheet: Transactions  
+Header baris pertama:
+ID | Date | Type | Category | Description | Amount | PaymentMethod | CreatedAt
+
+2. Sheet: Categories  
+Header baris pertama:
+Type | Category
+
+Contoh data:
+Expense | Food  
+Expense | Transport  
+Expense | Bills  
+Income | Salary  
+Income | Bonus  
+
+## Setup Google Apps Script
+
+1. Pergi ke https://script.google.com dan cipta projek baru.
+2. Masukkan fail berikut:
+   - Code.gs
+   - Index.html
+   - app.js.html
+   - style.html
+3. Salin Spreadsheet ID dari Google Sheets (bahagian antara /d/ dan /edit dalam URL).
+4. Jalankan function berikut sekali dalam Apps Script editor:
+
+```javascript
+setupSheetId("PASTE_SPREADSHEET_ID_DI_SINI");
 
 ## Setup Instructions
 1. Cipta Google Spreadsheet baharu dan sediakan sheet Transactions dan Categories seperti struktur yang dinyatakan.  
