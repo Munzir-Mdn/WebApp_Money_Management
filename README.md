@@ -54,7 +54,7 @@ Income | Bonus
 
 ```javascript
 setupSheetId("PASTE_SPREADSHEET_ID_DI_SINI");
-
+```
 
 ## Setup Instructions
 1. Cipta Google Spreadsheet baharu dan sediakan sheet Transactions dan Categories seperti struktur yang dinyatakan.  
